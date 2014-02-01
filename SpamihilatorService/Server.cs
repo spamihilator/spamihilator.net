@@ -59,6 +59,8 @@ namespace Spamihilator
             Socket s = (Socket)ar.AsyncState;
             socket = s.EndAccept(ar);
 
+            OnConnect();
+
             //receive data asynchronously
             socket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None,
                 new AsyncCallback(ReceiveCallback), this);
@@ -131,6 +133,14 @@ namespace Spamihilator
         }
 
         /// <summary>
+        /// Will be called after a connection has been established
+        /// </summary>
+        virtual protected void OnConnect()
+        {
+            //nothing to do here
+        }
+
+        /// <summary>
         /// Translates a line
         /// </summary>
         /// <param name="line">the line to translate</param>
@@ -139,14 +149,24 @@ namespace Spamihilator
         abstract protected bool Translate(String line);
 
         /// <summary>
+        /// Sends a string to the client
+        /// </summary>
+        /// <param name="str">the string to send</param>
+        protected void Send(String str)
+        {
+            log.Info(str.TrimEnd());
+            byte[] byteData = Encoding.ASCII.GetBytes(str);
+            socket.BeginSend(byteData, 0, byteData.Length, 0,
+                new AsyncCallback(SendCallback), this);
+        }
+
+        /// <summary>
         /// Sends a line to the client
         /// </summary>
         /// <param name="line">the line to send</param>
-        protected void Send(String line)
+        protected void SendLine(String line)
         {
-            byte[] byteData = Encoding.ASCII.GetBytes(line);
-            socket.BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(SendCallback), this);
+            Send(line + "\r\n");
         }
 
         /// <summary>

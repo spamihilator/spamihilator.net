@@ -21,10 +21,35 @@ namespace Spamihilator
     /// </summary>
     class Pop3Server : Server
     {
+        /// <summary>
+        /// Sends a success message
+        /// </summary>
+        /// <param name="line">the message to send</param>
+        private void SendOK(String line)
+        {
+            SendLine("+OK " + line);
+        }
+
+        /// <summary>
+        /// Sends an error message
+        /// </summary>
+        /// <param name="line">the message to send</param>
+        private void SendERR(String line)
+        {
+            SendLine("-ERR " + line);
+        }
+
+        override protected void OnConnect()
+        {
+            SendOK("Spamihilator ready.");
+        }
+
         override protected bool Translate(String line)
         {
-            if (line == "QUIT")
+            String up = line.ToUpper();
+            if (up == "QUIT")
             {
+                SendOK("Everything done.");
                 return false;
             }
             else
