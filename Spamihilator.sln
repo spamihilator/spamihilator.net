@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpamihilatorService", "SpamihilatorService\SpamihilatorService.csproj", "{919C2821-24DC-44B3-AA25-A2CA4C8F3CA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpamihilatorServiceTest", "SpamihilatorServiceTest\SpamihilatorServiceTest.csproj", "{87D9AC43-D0C4-42CD-84A7-97BDF5627E08}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{919C2821-24DC-44B3-AA25-A2CA4C8F3CA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{919C2821-24DC-44B3-AA25-A2CA4C8F3CA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{919C2821-24DC-44B3-AA25-A2CA4C8F3CA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87D9AC43-D0C4-42CD-84A7-97BDF5627E08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87D9AC43-D0C4-42CD-84A7-97BDF5627E08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87D9AC43-D0C4-42CD-84A7-97BDF5627E08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87D9AC43-D0C4-42CD-84A7-97BDF5627E08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
