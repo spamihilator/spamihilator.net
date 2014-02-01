@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using log4net;
 using System;
 using System.Net.Sockets;
 using System.Text;
@@ -42,6 +43,12 @@ namespace Spamihilator
         /// Internal buffer for asynchronously received lines
         /// </summary>
         private StringBuilder line = new StringBuilder();
+
+        /// <summary>
+        /// Logs communication with the server to a file
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Asynchronously accepts an incoming connection
@@ -92,7 +99,7 @@ namespace Spamihilator
                 if (l < read)
                 {
                     //we received a full line. translate it...
-                    if (!s.Translate(s.line.ToString()))
+                    if (!s.TranslateInternal(s.line.ToString()))
                     {
                         //quit signal received
                         s.socket.Shutdown(SocketShutdown.Both);
@@ -115,6 +122,12 @@ namespace Spamihilator
                 //socket was closed by peer
                 s.socket.Close();
             }
+        }
+
+        private bool TranslateInternal(String line)
+        {
+            log.Info(line);
+            return Translate(line);
         }
 
         /// <summary>
