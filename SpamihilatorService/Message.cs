@@ -16,29 +16,29 @@ using System;
 
 namespace Spamihilator
 {
+  /// <summary>
+  /// A message
+  /// </summary>
+  public class Message
+  {
     /// <summary>
-    /// A message
+    /// The message's original text
     /// </summary>
-    public class Message
+    public String Text { get; private set; }
+
+    /// <summary>
+    /// The message's root node
+    /// </summary>
+    public MessageNode Root { get; private set; }
+
+    /// <summary>
+    /// Parses a message text
+    /// </summary>
+    /// <param name="text">the text to parse</param>
+    public Message(String text)
     {
-        /// <summary>
-        /// The message's original text
-        /// </summary>
-        public String Text { get; private set; }
-
-        /// <summary>
-        /// The message's root node
-        /// </summary>
-        public MessageNode Root { get; private set; }
-
-        /// <summary>
-        /// Parses a message text
-        /// </summary>
-        /// <param name="text">the text to parse</param>
-        public Message(String text)
-        {
-            Text = text;
-            Root = new MessageNode(text);
-        }
+      Text = text;
+      Root = new MessageNode(text);
     }
+  }
 }

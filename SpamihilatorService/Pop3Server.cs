@@ -16,45 +16,45 @@ using System;
 
 namespace Spamihilator
 {
+  /// <summary>
+  /// A POP3 server
+  /// </summary>
+  class Pop3Server : Server
+  {
     /// <summary>
-    /// A POP3 server
+    /// Sends a success message
     /// </summary>
-    class Pop3Server : Server
+    /// <param name="line">the message to send</param>
+    private void SendOK(String line)
     {
-        /// <summary>
-        /// Sends a success message
-        /// </summary>
-        /// <param name="line">the message to send</param>
-        private void SendOK(String line)
-        {
-            SendLine("+OK " + line, () => Receive(Translate));
-        }
-
-        /// <summary>
-        /// Sends an error message
-        /// </summary>
-        /// <param name="line">the message to send</param>
-        private void SendERR(String line)
-        {
-            SendLine("-ERR " + line, () => Receive(Translate));
-        }
-
-        override protected void OnConnect()
-        {
-            SendOK("Spamihilator ready.");
-        }
-
-        private void Translate(String line)
-        {
-            String up = line.ToUpper();
-            if (up == "QUIT")
-            {
-                SendLine("+OK Everything done.", Shutdown);
-            }
-            else
-            {
-                SendOK(line);
-            }
-        }
+      SendLine("+OK " + line, () => Receive(Translate));
     }
+
+    /// <summary>
+    /// Sends an error message
+    /// </summary>
+    /// <param name="line">the message to send</param>
+    private void SendERR(String line)
+    {
+      SendLine("-ERR " + line, () => Receive(Translate));
+    }
+
+    override protected void OnConnect()
+    {
+      SendOK("Spamihilator ready.");
+    }
+
+    private void Translate(String line)
+    {
+      String up = line.ToUpper();
+      if (up == "QUIT")
+      {
+        SendLine("+OK Everything done.", Shutdown);
+      }
+      else
+      {
+        SendOK(line);
+      }
+    }
+  }
 }

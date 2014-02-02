@@ -17,22 +17,22 @@ using System.ServiceProcess;
 
 namespace Spamihilator
 {
-    static class Program
+  static class Program
+  {
+    static void Main()
     {
-        static void Main()
-        {
-            XmlConfigurator.Configure();
+      XmlConfigurator.Configure();
 
 #if !DEBUG
-            ServiceBase[] services = new ServiceBase[]
-            { 
-                new SpamihilatorService() 
-            };
-            ServiceBase.Run(services);
+      ServiceBase[] services = new ServiceBase[]
+      { 
+          new SpamihilatorService() 
+      };
+      ServiceBase.Run(services);
 #else
-            SpamihilatorService service = new SpamihilatorService();
-            service.Run();
+      SpamihilatorService service = new SpamihilatorService();
+      service.Run();
 #endif
-        }
     }
+  }
 }

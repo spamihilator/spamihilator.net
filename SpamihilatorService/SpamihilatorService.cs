@@ -20,44 +20,44 @@ using System.Threading;
 
 namespace Spamihilator
 {
+  /// <summary>
+  /// Spamihilator's background service
+  /// </summary>
+  public class SpamihilatorService : ServiceBase
+  {
+    public static ManualResetEvent accepted = new ManualResetEvent(false);
+
     /// <summary>
-    /// Spamihilator's background service
+    /// The service's main method
     /// </summary>
-    public class SpamihilatorService : ServiceBase
+    public void Run()
     {
-        public static ManualResetEvent accepted = new ManualResetEvent(false);
+      //listen to 127.0.0.1:115
+      IPAddress addr = IPAddress.Parse("127.0.0.1");
+      IPEndPoint localEP = new IPEndPoint(addr, 115);
+      Socket s = new Socket(AddressFamily.InterNetwork,
+        SocketType.Stream, ProtocolType.Tcp);
+      s.Bind(localEP);
+      s.Listen(100);
 
-        /// <summary>
-        /// The service's main method
-        /// </summary>
-        public void Run()
-        {
-            //listen to 127.0.0.1:115
-            IPAddress addr = IPAddress.Parse("127.0.0.1");
-            IPEndPoint localEP = new IPEndPoint(addr, 115);
-            Socket s = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp);
-            s.Bind(localEP);
-            s.Listen(100);
-
-            //accept incoming connections
-            while (true)
-            {
-                accepted.Reset();
-                s.BeginAccept(AcceptCallback, s);
-                accepted.WaitOne();
-            }
-        }
-
-        /// <summary>
-        /// Asynchronously accepts an incoming connection
-        /// </summary>
-        /// <param name="ar">the result of the asynchronous operation</param>
-        private static void AcceptCallback(IAsyncResult ar)
-        {
-            accepted.Set();
-            Pop3Server ps = new Pop3Server();
-            ps.Accept(ar);
-        }
+      //accept incoming connections
+      while (true)
+      {
+        accepted.Reset();
+        s.BeginAccept(AcceptCallback, s);
+        accepted.WaitOne();
+      }
     }
+
+    /// <summary>
+    /// Asynchronously accepts an incoming connection
+    /// </summary>
+    /// <param name="ar">the result of the asynchronous operation</param>
+    private static void AcceptCallback(IAsyncResult ar)
+    {
+      accepted.Set();
+      Pop3Server ps = new Pop3Server();
+      ps.Accept(ar);
+    }
+  }
 }

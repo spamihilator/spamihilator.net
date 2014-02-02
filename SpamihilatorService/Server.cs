@@ -17,28 +17,28 @@ using System.Net.Sockets;
 
 namespace Spamihilator
 {
+  /// <summary>
+  /// Base class for servers that handle received data line by line
+  /// </summary>
+  abstract class Server : Peer
+  {
     /// <summary>
-    /// Base class for servers that handle received data line by line
+    /// Asynchronously accepts an incoming connection
     /// </summary>
-    abstract class Server : Peer
+    /// <param name="ar">the result of the asynchronous operation</param>
+    public void Accept(IAsyncResult ar)
     {
-        /// <summary>
-        /// Asynchronously accepts an incoming connection
-        /// </summary>
-        /// <param name="ar">the result of the asynchronous operation</param>
-        public void Accept(IAsyncResult ar)
-        {
-            Socket s = (Socket)ar.AsyncState;
-            socket = s.EndAccept(ar);
-            OnConnect();
-        }
-
-        /// <summary>
-        /// Will be called after a connection has been established
-        /// </summary>
-        virtual protected void OnConnect()
-        {
-            //nothing to do here
-        }
+      Socket s = (Socket)ar.AsyncState;
+      socket = s.EndAccept(ar);
+      OnConnect();
     }
+
+    /// <summary>
+    /// Will be called after a connection has been established
+    /// </summary>
+    virtual protected void OnConnect()
+    {
+      //nothing to do here
+    }
+  }
 }
