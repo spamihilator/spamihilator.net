@@ -52,6 +52,7 @@
     <Compile Include="MessageHeader.cs" />
     <Compile Include="MessageHeaderField.cs" />
     <Compile Include="MessageNode.cs" />
+    <Compile Include="Peer.cs" />
     <Compile Include="Pop3Server.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="SpamihilatorService.cs">

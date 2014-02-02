@@ -27,7 +27,7 @@ namespace Spamihilator
         /// <param name="line">the message to send</param>
         private void SendOK(String line)
         {
-            SendLine("+OK " + line);
+            SendLine("+OK " + line, () => Receive(Translate));
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Spamihilator
         /// <param name="line">the message to send</param>
         private void SendERR(String line)
         {
-            SendLine("-ERR " + line);
+            SendLine("-ERR " + line, () => Receive(Translate));
         }
 
         override protected void OnConnect()
@@ -44,19 +44,17 @@ namespace Spamihilator
             SendOK("Spamihilator ready.");
         }
 
-        override protected bool Translate(String line)
+        private void Translate(String line)
         {
             String up = line.ToUpper();
             if (up == "QUIT")
             {
-                SendOK("Everything done.");
-                return false;
+                SendLine("+OK Everything done.", Shutdown);
             }
             else
             {
-                Send(line);
+                SendOK(line);
             }
-            return true;
         }
     }
 }
