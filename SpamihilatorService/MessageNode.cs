@@ -17,13 +17,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Spamihilator
-{
+namespace Spamihilator {
   /// <summary>
   /// A message node
   /// </summary>
-  public class MessageNode
-  {
+  public class MessageNode {
     private String node;
 
     /// <summary>
@@ -45,22 +43,17 @@ namespace Spamihilator
     /// Parses a message node
     /// </summary>
     /// <param name="node">the node to parse</param>
-    public MessageNode(String node)
-    {
+    public MessageNode(String node) {
       this.node = node;
 
-      using (StringReader reader = new StringReader(node))
-      {
+      using (StringReader reader = new StringReader(node)) {
         Header = ParseHeader(reader);
         String boundary = GetBoundary(GetFields(
           MessageHeaderField.FieldType.ContentType));
-        if (boundary != null)
-        {
+        if (boundary != null) {
           Children = ParseBody(reader, boundary);
           Body = null;
-        }
-        else
-        {
+        } else {
           Children = new List<MessageNode>();
           Body = ParseBody(reader);
         }
@@ -72,33 +65,25 @@ namespace Spamihilator
     /// </summary>
     /// <param name="reader">reads lines from the node</param>
     /// <returns>the header</returns>
-    private static MessageHeader ParseHeader(StringReader reader)
-    {
+    private static MessageHeader ParseHeader(StringReader reader) {
       List<MessageHeaderField> headerFields = new List<MessageHeaderField>();
 
       String currentHeaderLine = "";
       String line;
-      while ((line = reader.ReadLine()) != null)
-      {
-        if (line.Length == 0)
-        {
+      while ((line = reader.ReadLine()) != null) {
+        if (line.Length == 0) {
           //end of header
-          if (currentHeaderLine.Length != 0)
-          {
+          if (currentHeaderLine.Length != 0) {
             headerFields.Add(new MessageHeaderField(currentHeaderLine));
           }
           break;
         }
 
-        if (line.StartsWith("\t") || line.StartsWith(" "))
-        {
+        if (line.StartsWith("\t") || line.StartsWith(" ")) {
           //multi-line header field
           currentHeaderLine += " " + line.Trim();
-        }
-        else
-        {
-          if (currentHeaderLine.Length != 0)
-          {
+        } else {
+          if (currentHeaderLine.Length != 0) {
             headerFields.Add(new MessageHeaderField(currentHeaderLine));
           }
           currentHeaderLine = line.TrimEnd();
@@ -117,20 +102,16 @@ namespace Spamihilator
     /// <returns>the boundary or null if the message is not a
     /// multi-part message</returns>
     private static String GetBoundary(
-        IEnumerable<MessageHeaderField> contentTypes)
-    {
+        IEnumerable<MessageHeaderField> contentTypes) {
       String boundary = null;
-      foreach (MessageHeaderField f in contentTypes)
-      {
+      foreach (MessageHeaderField f in contentTypes) {
         //check if this is a multi-part message
         if (f.Body.IndexOf("multipart",
-          StringComparison.OrdinalIgnoreCase) >= 0)
-        {
+          StringComparison.OrdinalIgnoreCase) >= 0) {
           //look for boundary
           int bound = f.Body.IndexOf("boundary",
             StringComparison.OrdinalIgnoreCase);
-          if (bound >= 0)
-          {
+          if (bound >= 0) {
             bound += 8; //"boundary".Length
             int start = f.Body.IndexOf('=', bound);
             if (start < 0)
@@ -143,28 +124,21 @@ namespace Spamihilator
               Char.IsWhiteSpace(f.Body[start])) start++;
 
             int end;
-            if (f.Body[start] == '"')
-            {
+            if (f.Body[start] == '"') {
               //handle quoted boundary
               ++start;
               end = start;
-              while (end < f.Body.Length)
-              {
+              while (end < f.Body.Length) {
                 if (f.Body[end] == '\\' && end < f.Body.Length - 1 &&
-                  f.Body[end + 1] == '"')
-                {
+                  f.Body[end + 1] == '"') {
                   //skip escaped " character
                   ++end;
-                }
-                else if (f.Body[end] == '"')
-                {
+                } else if (f.Body[end] == '"') {
                   break;
                 }
                 ++end;
               }
-            }
-            else
-            {
+            } else {
               //skip to end of parameter or end of field
               end = start;
               while (end < f.Body.Length && f.Body[end] != ';')
@@ -180,8 +154,7 @@ namespace Spamihilator
       }
 
       //return null if boundary is empty
-      if (boundary != null && boundary.Length == 0)
-      {
+      if (boundary != null && boundary.Length == 0) {
         boundary = null;
       }
 
@@ -193,12 +166,10 @@ namespace Spamihilator
     /// </summary>
     /// <param name="reader">reads the message's contents</param>
     /// <returns>the message body</returns>
-    private static String ParseBody(StringReader reader)
-    {
+    private static String ParseBody(StringReader reader) {
       StringBuilder body = new StringBuilder();
       String line;
-      while ((line = reader.ReadLine()) != null)
-      {
+      while ((line = reader.ReadLine()) != null) {
         if (body.Length > 0)
           body.Append("\r\n");
         body.Append(line);
@@ -215,12 +186,10 @@ namespace Spamihilator
     /// nodes</param>
     /// <returns>a list of parsed multi-part nodes</returns>
     private static IReadOnlyList<MessageNode> ParseBody(
-        StringReader reader, String boundary)
-    {
+        StringReader reader, String boundary) {
       //skip everything until first boundary
       String line;
-      while ((line = reader.ReadLine()) != null)
-      {
+      while ((line = reader.ReadLine()) != null) {
         if (line.Equals("--" + boundary))
           break;
       }
@@ -228,22 +197,16 @@ namespace Spamihilator
       //read nodes
       List<MessageNode> nodes = new List<MessageNode>();
       StringBuilder body = new StringBuilder();
-      while ((line = reader.ReadLine()) != null)
-      {
-        if (line.Equals("--" + boundary))
-        {
+      while ((line = reader.ReadLine()) != null) {
+        if (line.Equals("--" + boundary)) {
           //new node
           if (body.Length > 0)
             nodes.Add(new MessageNode(body.ToString()));
           body.Clear();
-        }
-        else if (line.Equals("--" + boundary + "--"))
-        {
+        } else if (line.Equals("--" + boundary + "--")) {
           //last node
           break;
-        }
-        else
-        {
+        } else {
           //save line for current node
           if (body.Length > 0)
             body.Append("\r\n");
@@ -265,8 +228,7 @@ namespace Spamihilator
     /// <param name="name">the header field name</param>
     /// <returns>a list of header fields having the given name (may be
     /// empty)</returns>
-    public IEnumerable<MessageHeaderField> GetFields(String name)
-    {
+    public IEnumerable<MessageHeaderField> GetFields(String name) {
       return Header.GetFields(name);
     }
 
@@ -276,8 +238,7 @@ namespace Spamihilator
     /// <param name="name">the header field name</param>
     /// <returns>the body of the header field or null if there
     /// is no such field</returns>
-    public String GetFieldBody(String name)
-    {
+    public String GetFieldBody(String name) {
       return Header.GetFieldBody(name);
     }
 
@@ -288,8 +249,7 @@ namespace Spamihilator
     /// <returns>a list of header fields having the given type (may be
     /// empty</returns>
     public IEnumerable<MessageHeaderField> GetFields(
-        MessageHeaderField.FieldType type)
-    {
+        MessageHeaderField.FieldType type) {
       return Header.GetFields(type);
     }
 
@@ -299,8 +259,7 @@ namespace Spamihilator
     /// <param name="type">the header field type</param>
     /// <returns>the body of the header field or null if there
     /// is no such field</returns>
-    public String GetFieldBody(MessageHeaderField.FieldType type)
-    {
+    public String GetFieldBody(MessageHeaderField.FieldType type) {
       return Header.GetFieldBody(type);
     }
   }

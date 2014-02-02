@@ -14,13 +14,11 @@
 
 using System;
 
-namespace Spamihilator
-{
+namespace Spamihilator {
   /// <summary>
   /// A message
   /// </summary>
-  public class Message
-  {
+  public class Message {
     /// <summary>
     /// The message's original text
     /// </summary>
@@ -35,8 +33,7 @@ namespace Spamihilator
     /// Parses a message text
     /// </summary>
     /// <param name="text">the text to parse</param>
-    public Message(String text)
-    {
+    public Message(String text) {
       Text = text;
       Root = new MessageNode(text);
     }

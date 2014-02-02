@@ -16,16 +16,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Spamihilator
-{
+namespace Spamihilator {
   using FieldType = MessageHeaderField.FieldType;
   using FieldsByType = ILookup<MessageHeaderField.FieldType, MessageHeaderField>;
 
   /// <summary>
   /// A message header
   /// </summary>
-  public class MessageHeader
-  {
+  public class MessageHeader {
     private FieldsByType fieldsByType;
 
     /// <summary>
@@ -37,8 +35,7 @@ namespace Spamihilator
     /// Constructs a new header
     /// </summary>
     /// <param name="fields">the parsed header fields</param>
-    public MessageHeader(IReadOnlyList<MessageHeaderField> fields)
-    {
+    public MessageHeader(IReadOnlyList<MessageHeaderField> fields) {
       Fields = fields;
       fieldsByType = (FieldsByType)fields.ToLookup(f => f.Type);
     }
@@ -49,10 +46,9 @@ namespace Spamihilator
     /// <param name="name">the field name</param>
     /// <returns>a list of fields having the given name (may be
     /// empty)</returns>
-    public IEnumerable<MessageHeaderField> GetFields(String name)
-    {
+    public IEnumerable<MessageHeaderField> GetFields(String name) {
       return Fields.Where(f => f.Name.Equals(name,
-          StringComparison.OrdinalIgnoreCase));
+        StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -61,10 +57,9 @@ namespace Spamihilator
     /// <param name="name">the field name</param>
     /// <returns>the body of the field or null if there
     /// is no such field</returns>
-    public String GetFieldBody(String name)
-    {
+    public String GetFieldBody(String name) {
       MessageHeaderField r = Fields.FirstOrDefault(f => f.Name.Equals(
-          name, StringComparison.OrdinalIgnoreCase));
+        name, StringComparison.OrdinalIgnoreCase));
       return (r != null ? r.Body : null);
     }
 
@@ -74,8 +69,7 @@ namespace Spamihilator
     /// <param name="type">the field type</param>
     /// <returns>a list of fields having the given type (may be
     /// empty</returns>
-    public IEnumerable<MessageHeaderField> GetFields(FieldType type)
-    {
+    public IEnumerable<MessageHeaderField> GetFields(FieldType type) {
       return fieldsByType[type];
     }
 
@@ -85,8 +79,7 @@ namespace Spamihilator
     /// <param name="type">the field type</param>
     /// <returns>the body of the field or null if there
     /// is no such field</returns>
-    public String GetFieldBody(FieldType type)
-    {
+    public String GetFieldBody(FieldType type) {
       MessageHeaderField r = fieldsByType[type].FirstOrDefault();
       return (r != null ? r.Body : null);
     }

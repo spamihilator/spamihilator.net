@@ -17,10 +17,8 @@ using System;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Spamihilator
-{
-  abstract class Peer
-  {
+namespace Spamihilator {
+  abstract class Peer {
     /// <summary>
     /// A delegate that will be called when an asynchronous send
     /// operation has completed successfully
@@ -63,8 +61,7 @@ namespace Spamihilator
     /// <summary>
     /// Gracefully shuts the connection down and releases all resources
     /// </summary>
-    protected void Shutdown()
-    {
+    protected void Shutdown() {
       socket.Shutdown(SocketShutdown.Both);
       socket.Close();
     }
@@ -74,8 +71,7 @@ namespace Spamihilator
     /// </summary>
     /// <param name="callback">a method to call after the asynchronous
     /// receive operation has been completed successfully</param>
-    protected void Receive(ReceiveCallback callback)
-    {
+    protected void Receive(ReceiveCallback callback) {
       //receive more data
       socket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None,
         ar => ReceiveCallbackInternal(ar, callback), this);
@@ -88,19 +84,15 @@ namespace Spamihilator
     /// <param name="callback">a method to call after the asynchronous
     /// receive operation has been completed successfully</param>
     private static void ReceiveCallbackInternal(IAsyncResult ar,
-      ReceiveCallback callback)
-    {
+      ReceiveCallback callback) {
       Peer p = (Peer)ar.AsyncState;
       int read = p.socket.EndReceive(ar);
 
-      if (read > 0)
-      {
+      if (read > 0) {
         //look for end of line
         int l = read;
-        for (int i = 0; i < read; ++i)
-        {
-          if (p.buffer[i] == '\n')
-          {
+        for (int i = 0; i < read; ++i) {
+          if (p.buffer[i] == '\n') {
             l = i;
             break;
           }
@@ -108,16 +100,14 @@ namespace Spamihilator
 
         //trim '\r' if there is any
         int l2 = l;
-        if (l2 > 0 && p.buffer[l2 - 1] == '\r')
-        {
+        if (l2 > 0 && p.buffer[l2 - 1] == '\r') {
           --l2;
         }
 
         //append data to line buffer
         p.line.Append(Encoding.ASCII.GetString(p.buffer, 0, l2));
 
-        if (l < read)
-        {
+        if (l < read) {
           //we received a full line
           String line = p.line.ToString();
           log.Info(line);
@@ -131,15 +121,11 @@ namespace Spamihilator
 
           if (callback != null)
             callback(line);
-        }
-        else
-        {
+        } else {
           //receive more data
           p.Receive(callback);
         }
-      }
-      else
-      {
+      } else {
         //socket was closed by peer
         p.socket.Close();
       }
@@ -151,8 +137,7 @@ namespace Spamihilator
     /// <param name="str">the string to send</param>
     /// <param name="callback">a method to call after the string
     /// has been successfully sent</param>
-    protected void Send(String str, SendCallback callback)
-    {
+    protected void Send(String str, SendCallback callback) {
       log.Info(str.TrimEnd());
       byte[] byteData = Encoding.ASCII.GetBytes(str);
       socket.BeginSend(byteData, 0, byteData.Length, 0,
@@ -165,8 +150,7 @@ namespace Spamihilator
     /// <param name="line">the line to send</param>
     /// <param name="callback">a method to call after the line
     /// has been successfully sent</param>
-    protected void SendLine(String line, SendCallback callback)
-    {
+    protected void SendLine(String line, SendCallback callback) {
       Send(line + "\r\n", callback);
     }
 
@@ -177,13 +161,11 @@ namespace Spamihilator
     /// <param name="callback">a method to call after the asynchronous
     /// send operation has been completed successfully</param>
     private static void SendCallbackInternal(IAsyncResult ar,
-      SendCallback callback)
-    {
+      SendCallback callback) {
       Peer p = (Peer)ar.AsyncState;
       int bytesSent = p.socket.EndSend(ar);
 
-      if (callback != null)
-      {
+      if (callback != null) {
         callback();
       }
     }

@@ -16,20 +16,17 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Spamihilator
-{
+namespace Spamihilator {
   /// <summary>
   /// Base class for clients that send and receive data line by line
   /// </summary>
-  class Client : Peer
-  {
+  class Client : Peer {
     /// <summary>
     /// Connect to a remote host
     /// </summary>
     /// <param name="host">the remote host</param>
     /// <param name="port">the port to connect</param>
-    public void Connect(String host, int port)
-    {
+    public void Connect(String host, int port) {
       IPAddress addr = IPAddress.Parse(host);
       IPEndPoint remoteEP = new IPEndPoint(addr, port);
 
@@ -42,8 +39,7 @@ namespace Spamihilator
     /// Will be called after a connection has been established successfully.
     /// </summary>
     /// <param name="ar">the result of the asynchronous operation</param>
-    private static void ConnectCallback(IAsyncResult ar)
-    {
+    private static void ConnectCallback(IAsyncResult ar) {
       Client client = (Client)ar.AsyncState;
       client.socket.EndConnect(ar);
       client.OnConnect();
@@ -52,8 +48,7 @@ namespace Spamihilator
     /// <summary>
     /// Will be called after a connection has been established
     /// </summary>
-    virtual protected void OnConnect()
-    {
+    virtual protected void OnConnect() {
       //nothing to do here
     }
   }

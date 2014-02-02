@@ -14,19 +14,16 @@
 
 using System;
 
-namespace Spamihilator
-{
+namespace Spamihilator {
   /// <summary>
   /// A POP3 server
   /// </summary>
-  class Pop3Server : Server
-  {
+  class Pop3Server : Server {
     /// <summary>
     /// Sends a success message
     /// </summary>
     /// <param name="line">the message to send</param>
-    private void SendOK(String line)
-    {
+    private void SendOK(String line) {
       SendLine("+OK " + line, () => Receive(Translate));
     }
 
@@ -34,25 +31,19 @@ namespace Spamihilator
     /// Sends an error message
     /// </summary>
     /// <param name="line">the message to send</param>
-    private void SendERR(String line)
-    {
+    private void SendERR(String line) {
       SendLine("-ERR " + line, () => Receive(Translate));
     }
 
-    override protected void OnConnect()
-    {
+    override protected void OnConnect() {
       SendOK("Spamihilator ready.");
     }
 
-    private void Translate(String line)
-    {
+    private void Translate(String line) {
       String up = line.ToUpper();
-      if (up == "QUIT")
-      {
+      if (up == "QUIT") {
         SendLine("+OK Everything done.", Shutdown);
-      }
-      else
-      {
+      } else {
         SendOK(line);
       }
     }

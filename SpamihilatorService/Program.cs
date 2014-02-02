@@ -15,12 +15,9 @@
 using log4net.Config;
 using System.ServiceProcess;
 
-namespace Spamihilator
-{
-  static class Program
-  {
-    static void Main()
-    {
+namespace Spamihilator {
+  static class Program {
+    static void Main() {
       XmlConfigurator.Configure();
 
 #if !DEBUG

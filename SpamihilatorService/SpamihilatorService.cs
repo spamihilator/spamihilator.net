@@ -18,20 +18,17 @@ using System.Net.Sockets;
 using System.ServiceProcess;
 using System.Threading;
 
-namespace Spamihilator
-{
+namespace Spamihilator {
   /// <summary>
   /// Spamihilator's background service
   /// </summary>
-  public class SpamihilatorService : ServiceBase
-  {
+  public class SpamihilatorService : ServiceBase {
     public static ManualResetEvent accepted = new ManualResetEvent(false);
 
     /// <summary>
     /// The service's main method
     /// </summary>
-    public void Run()
-    {
+    public void Run() {
       //listen to 127.0.0.1:115
       IPAddress addr = IPAddress.Parse("127.0.0.1");
       IPEndPoint localEP = new IPEndPoint(addr, 115);
@@ -41,8 +38,7 @@ namespace Spamihilator
       s.Listen(100);
 
       //accept incoming connections
-      while (true)
-      {
+      while (true) {
         accepted.Reset();
         s.BeginAccept(AcceptCallback, s);
         accepted.WaitOne();
@@ -53,8 +49,7 @@ namespace Spamihilator
     /// Asynchronously accepts an incoming connection
     /// </summary>
     /// <param name="ar">the result of the asynchronous operation</param>
-    private static void AcceptCallback(IAsyncResult ar)
-    {
+    private static void AcceptCallback(IAsyncResult ar) {
       accepted.Set();
       Pop3Server ps = new Pop3Server();
       ps.Accept(ar);

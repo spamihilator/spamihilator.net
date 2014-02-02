@@ -14,18 +14,15 @@
 
 using System;
 
-namespace Spamihilator
-{
+namespace Spamihilator {
   /// <summary>
   /// A message header's field
   /// </summary>
-  public class MessageHeaderField
-  {
+  public class MessageHeaderField {
     /// <summary>
     /// Well known field types
     /// </summary>
-    public enum FieldType
-    {
+    public enum FieldType {
       To,
       From,
       ContentType,
@@ -55,51 +52,32 @@ namespace Spamihilator
     /// Parses a field
     /// </summary>
     /// <param name="line">the line to parse</param>
-    public MessageHeaderField(String line)
-    {
+    public MessageHeaderField(String line) {
       //get field name and body
       int colon = line.IndexOf(':');
-      if (colon >= 0)
-      {
+      if (colon >= 0) {
         Name = line.Substring(0, colon).Trim();
         Body = line.Substring(colon + 1).Trim();
-      }
-      else
-      {
+      } else {
         Name = line.Trim();
       }
 
       //determine type
-      if (Name.Equals("To", StringComparison.OrdinalIgnoreCase))
-      {
+      if (Name.Equals("To", StringComparison.OrdinalIgnoreCase)) {
         Type = FieldType.To;
-      }
-      else if (Name.Equals("From", StringComparison.OrdinalIgnoreCase))
-      {
+      } else if (Name.Equals("From", StringComparison.OrdinalIgnoreCase)) {
         Type = FieldType.From;
-      }
-      else if (Name.Equals("Content-Type", StringComparison.OrdinalIgnoreCase))
-      {
+      } else if (Name.Equals("Content-Type", StringComparison.OrdinalIgnoreCase)) {
         Type = FieldType.ContentType;
-      }
-      else if (Name.Equals("BCC", StringComparison.OrdinalIgnoreCase))
-      {
+      } else if (Name.Equals("BCC", StringComparison.OrdinalIgnoreCase)) {
         Type = FieldType.BCC;
-      }
-      else if (Name.Equals("CC", StringComparison.OrdinalIgnoreCase))
-      {
+      } else if (Name.Equals("CC", StringComparison.OrdinalIgnoreCase)) {
         Type = FieldType.CC;
-      }
-      else if (Name.Equals("Subject", StringComparison.OrdinalIgnoreCase))
-      {
+      } else if (Name.Equals("Subject", StringComparison.OrdinalIgnoreCase)) {
         Type = FieldType.Subject;
-      }
-      else if (Name.Equals("Date", StringComparison.OrdinalIgnoreCase))
-      {
+      } else if (Name.Equals("Date", StringComparison.OrdinalIgnoreCase)) {
         Type = FieldType.Date;
-      }
-      else
-      {
+      } else {
         Type = FieldType.Other;
       }
     }
