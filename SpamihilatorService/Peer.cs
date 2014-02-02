@@ -18,7 +18,10 @@ using System.Net.Sockets;
 using System.Text;
 
 namespace Spamihilator {
-  abstract class Peer {
+  /// <summary>
+  /// A base class for asynchronous peer connections
+  /// </summary>
+  public abstract class Peer {
     /// <summary>
     /// A delegate that will be called when an asynchronous send
     /// operation has completed successfully

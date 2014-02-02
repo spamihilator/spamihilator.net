@@ -20,36 +20,41 @@ namespace Spamihilator {
   /// <summary>
   /// Base class for clients that send and receive data line by line
   /// </summary>
-  class Client : Peer {
+  public class Client : Peer {
+    public delegate void ConnectCallback();
+
     /// <summary>
     /// Connect to a remote host
     /// </summary>
     /// <param name="host">the remote host</param>
     /// <param name="port">the port to connect</param>
-    public void Connect(String host, int port) {
-      IPAddress addr = IPAddress.Parse(host);
+    /// <param name="callback">a method that will be called when
+    /// the connection has been established successfully</param>
+    virtual public void Connect(String host, int port,
+      ConnectCallback callback) {
+      IPHostEntry entry = Dns.GetHostEntry(host);
+      IPAddress addr = entry.AddressList[0];
       IPEndPoint remoteEP = new IPEndPoint(addr, port);
 
       socket = new Socket(AddressFamily.InterNetwork,
         SocketType.Stream, ProtocolType.Tcp);
-      socket.BeginConnect(remoteEP, ConnectCallback, this);
+      socket.BeginConnect(remoteEP, ar => ConnectCallbackInternal(
+        ar, callback), this);
     }
 
     /// <summary>
     /// Will be called after a connection has been established successfully.
     /// </summary>
     /// <param name="ar">the result of the asynchronous operation</param>
-    private static void ConnectCallback(IAsyncResult ar) {
+    /// <param name="callback">a method that will be called when
+    /// the connection has been established successfully</param>
+    private static void ConnectCallbackInternal(IAsyncResult ar,
+      ConnectCallback callback) {
       Client client = (Client)ar.AsyncState;
       client.socket.EndConnect(ar);
-      client.OnConnect();
-    }
-
-    /// <summary>
-    /// Will be called after a connection has been established
-    /// </summary>
-    virtual protected void OnConnect() {
-      //nothing to do here
+      if (callback != null) {
+        callback();
+      }
     }
   }
 }
