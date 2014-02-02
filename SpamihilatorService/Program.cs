@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using log4net.Config;
+using System.ServiceProcess;
 
 namespace Spamihilator
 {
