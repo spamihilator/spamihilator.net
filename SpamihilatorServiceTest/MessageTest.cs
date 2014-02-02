@@ -16,45 +16,41 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Spamihilator;
 
-namespace SpamihilatorServiceTest
-{
+namespace SpamihilatorServiceTest {
+  /// <summary>
+  /// Tests the Message class
+  /// </summary>
+  [TestClass]
+  public class MessageTest {
     /// <summary>
-    /// Tests the Message class
+    /// Tests if a simple message can be parsed
     /// </summary>
-    [TestClass]
-    public class MessageTest
-    {
-        /// <summary>
-        /// Tests if a simple message can be parsed
-        /// </summary>
-        [TestMethod]
-        public void ParseSimpleMessage()
-        {
-            String text = @"From: Alice <alice@foo.com>
+    [TestMethod]
+    public void ParseSimpleMessage() {
+      String text = @"From: Alice <alice@foo.com>
 To: Bob <bob@foo.com>
 Subject: Greetings
 
 Hello Bob!
 ";
-            Message msg = new Message(text);
-            Assert.AreEqual(text, msg.Text);
-            Assert.AreEqual("Hello Bob!", msg.Root.Body);
-            Assert.AreEqual("Greetings", msg.Root.GetFieldBody("Subject"));
-            Assert.AreEqual("Alice <alice@foo.com>", msg.Root.GetFieldBody(
-                MessageHeaderField.FieldType.From));
-            Assert.AreEqual("Bob <bob@foo.com>", msg.Root.GetFieldBody(
-                MessageHeaderField.FieldType.To));
-            Assert.AreEqual("Greetings", msg.Root.GetFieldBody(
-                MessageHeaderField.FieldType.Subject));
-        }
+      Message msg = new Message(text);
+      Assert.AreEqual(text, msg.Text);
+      Assert.AreEqual("Hello Bob!", msg.Root.Body);
+      Assert.AreEqual("Greetings", msg.Root.GetFieldBody("Subject"));
+      Assert.AreEqual("Alice <alice@foo.com>", msg.Root.GetFieldBody(
+          MessageHeaderField.FieldType.From));
+      Assert.AreEqual("Bob <bob@foo.com>", msg.Root.GetFieldBody(
+          MessageHeaderField.FieldType.To));
+      Assert.AreEqual("Greetings", msg.Root.GetFieldBody(
+          MessageHeaderField.FieldType.Subject));
+    }
 
-        /// <summary>
-        /// Tests if a multi-part message can be parsed
-        /// </summary>
-        [TestMethod]
-        public void ParseMultipartMessage()
-        {
-            String text = @"From: Alice <alice@foo.com>
+    /// <summary>
+    /// Tests if a multi-part message can be parsed
+    /// </summary>
+    [TestMethod]
+    public void ParseMultipartMessage() {
+      String text = @"From: Alice <alice@foo.com>
 To: Bob <bob@foo.com>
 Subject: Greetings
 Content-Type: multipart/alternative; boundary=boundary42
@@ -75,22 +71,21 @@ Merry Christmas!
 --boundary42--
 ";
 
-            Message msg = new Message(text);
-            Assert.AreEqual("Greetings", msg.Root.GetFieldBody("Subject"));
-            Assert.AreEqual(3, msg.Root.Children.Count);
-            Assert.IsNull(msg.Root.Body);
-            Assert.AreEqual("Hello Bob!", msg.Root.Children[0].Body);
-            Assert.AreEqual("Dear Bob!", msg.Root.Children[1].Body);
-            Assert.AreEqual("Merry Christmas!", msg.Root.Children[2].Body);
-        }
+      Message msg = new Message(text);
+      Assert.AreEqual("Greetings", msg.Root.GetFieldBody("Subject"));
+      Assert.AreEqual(3, msg.Root.Children.Count);
+      Assert.IsNull(msg.Root.Body);
+      Assert.AreEqual("Hello Bob!", msg.Root.Children[0].Body);
+      Assert.AreEqual("Dear Bob!", msg.Root.Children[1].Body);
+      Assert.AreEqual("Merry Christmas!", msg.Root.Children[2].Body);
+    }
 
-        /// <summary>
-        /// Tests if a multi-part message with nested nodes can be parsed
-        /// </summary>
-        [TestMethod]
-        public void ParseNestedMultipartMessage()
-        {
-            String text = @"From: Alice <alice@foo.com>
+    /// <summary>
+    /// Tests if a multi-part message with nested nodes can be parsed
+    /// </summary>
+    [TestMethod]
+    public void ParseNestedMultipartMessage() {
+      String text = @"From: Alice <alice@foo.com>
 To: Bob <bob@foo.com>
 Subject: Greetings
 Content-Type: multipart/alternative; boundary=boundary42
@@ -122,17 +117,17 @@ Merry Christmas!
 Remaining ignore.
 ";
 
-            Message msg = new Message(text);
-            Assert.AreEqual("Greetings", msg.Root.GetFieldBody("Subject"));
-            Assert.AreEqual(3, msg.Root.Children.Count);
-            Assert.IsNull(msg.Root.Body);
-            Assert.IsNull(msg.Root.Children[0].Body);
-            Assert.AreEqual(2, msg.Root.Children[0].Children.Count);
-            Assert.AreEqual("Hello Bob!", msg.Root.Children[0].Children[0].Body);
-            Assert.AreEqual("To whom it may concern!",
-                msg.Root.Children[0].Children[1].Body);
-            Assert.AreEqual("Dear Bob!", msg.Root.Children[1].Body);
-            Assert.AreEqual("Merry Christmas!", msg.Root.Children[2].Body);
-        }
+      Message msg = new Message(text);
+      Assert.AreEqual("Greetings", msg.Root.GetFieldBody("Subject"));
+      Assert.AreEqual(3, msg.Root.Children.Count);
+      Assert.IsNull(msg.Root.Body);
+      Assert.IsNull(msg.Root.Children[0].Body);
+      Assert.AreEqual(2, msg.Root.Children[0].Children.Count);
+      Assert.AreEqual("Hello Bob!", msg.Root.Children[0].Children[0].Body);
+      Assert.AreEqual("To whom it may concern!",
+        msg.Root.Children[0].Children[1].Body);
+      Assert.AreEqual("Dear Bob!", msg.Root.Children[1].Body);
+      Assert.AreEqual("Merry Christmas!", msg.Root.Children[2].Body);
     }
+  }
 }
