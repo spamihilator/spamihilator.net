@@ -44,7 +44,7 @@ namespace Spamihilator
             while (true)
             {
                 accepted.Reset();
-                s.BeginAccept(new AsyncCallback(AcceptCallback), s);
+                s.BeginAccept(AcceptCallback, s);
                 accepted.WaitOne();
             }
         }
