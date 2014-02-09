@@ -57,6 +57,16 @@ namespace Spamihilator {
     private byte[] buffer = new byte[BUFFER_SIZE];
 
     /// <summary>
+    /// Number of bytes read from the buffer
+    /// </summary>
+    private int bufferPos = 0;
+
+    /// <summary>
+    /// Number of bytes written to the buffer
+    /// </summary>
+    private int bufferFilled = 0;
+
+    /// <summary>
     /// Internal buffer for asynchronously received lines
     /// </summary>
     private StringBuilder line = new StringBuilder();
@@ -75,9 +85,16 @@ namespace Spamihilator {
     /// <param name="callback">a method to call after the asynchronous
     /// receive operation has been completed successfully</param>
     protected void Receive(ReceiveCallback callback) {
-      //receive more data
-      socket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None,
-        ar => ReceiveCallbackInternal(ar, callback), this);
+      if (bufferPos == bufferFilled) {
+        bufferPos = 0;
+        bufferFilled = 0;
+
+        //receive more data
+        socket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None,
+          ar => ReceiveCallbackInternal(ar, callback), this);
+      } else {
+        ReceiveLineFromBuffer(callback);
+      }
     }
 
     /// <summary>
@@ -89,48 +106,60 @@ namespace Spamihilator {
     private static void ReceiveCallbackInternal(IAsyncResult ar,
       ReceiveCallback callback) {
       Peer p = (Peer)ar.AsyncState;
-      int read = p.socket.EndReceive(ar);
-
-      if (read > 0) {
-        //look for end of line
-        int l = read;
-        for (int i = 0; i < read; ++i) {
-          if (p.buffer[i] == '\n') {
-            l = i;
-            break;
-          }
-        }
-
-        //trim '\r' if there is any
-        int l2 = l;
-        if (l2 > 0 && p.buffer[l2 - 1] == '\r') {
-          --l2;
-        }
-
-        //append data to line buffer
-        p.line.Append(Encoding.ASCII.GetString(p.buffer, 0, l2));
-
-        if (l < read) {
-          //we received a full line
-          String line = p.line.ToString();
-          log.Info(line);
-
-          //clear line buffer and append rest of byte buffer
-          //do this before calling the callback as it may
-          //start another asynchronous receive operation
-          p.line.Clear();
-          p.line.Append(Encoding.ASCII.GetString(p.buffer, l + 1,
-            read - l - 1));
-
-          if (callback != null)
-            callback(line);
-        } else {
-          //receive more data
-          p.Receive(callback);
-        }
-      } else {
+      p.bufferFilled = p.socket.EndReceive(ar);
+      if (p.bufferFilled <= 0) {
         //socket was closed by peer
+        p.bufferFilled = 0;
+        p.bufferPos = 0;
         p.socket.Close();
+      } else {
+        p.ReceiveLineFromBuffer(callback);
+      }
+    }
+
+    /// <summary>
+    /// Receives a full line from the buffer. Reads more bytes from
+    /// the peer if there is not enough data available.
+    /// </summary>
+    /// <param name="callback">a method to call after the asynchronous
+    /// receive operation has been completed successfully</param>
+    private void ReceiveLineFromBuffer(ReceiveCallback callback) {
+      //look for end of line
+      int l = bufferFilled;
+      for (int i = bufferPos; i < bufferFilled; ++i) {
+        if (buffer[i] == '\n') {
+          l = i;
+          break;
+        }
+      }
+
+      //trim '\r' if there is any
+      int l2 = l;
+      if (l2 > 0 && buffer[l2 - 1] == '\r') {
+        --l2;
+      }
+
+      //append data to line buffer
+      line.Append(Encoding.ASCII.GetString(buffer, bufferPos, l2 - bufferPos));
+
+      if (l < bufferFilled) {
+        //we received a full line
+        String strline = line.ToString();
+        log.Info(strline);
+
+        //set buffer pos after end of line
+        bufferPos = l + 1;
+
+        //clear line buffer. do this before calling the callback
+        //as it may start another asynchronous receive operation
+        line.Clear();
+
+        if (callback != null)
+          callback(strline);
+      } else {
+        //receive more data
+        bufferPos = bufferFilled;
+        Receive(callback);
       }
     }
 
