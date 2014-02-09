@@ -29,18 +29,14 @@ namespace Spamihilator {
     /// The service's main method
     /// </summary>
     public void Run() {
-      //listen to 127.0.0.1:115
-      IPAddress addr = IPAddress.Parse("127.0.0.1");
-      IPEndPoint localEP = new IPEndPoint(addr, 115);
-      Socket s = new Socket(AddressFamily.InterNetwork,
-        SocketType.Stream, ProtocolType.Tcp);
-      s.Bind(localEP);
-      s.Listen(100);
+      //listen to ::1, port 115
+      TcpListener listener = new TcpListener(IPAddress.IPv6Loopback, 115);
+      listener.Start();
 
       //accept incoming connections
       while (true) {
         accepted.Reset();
-        s.BeginAccept(AcceptCallback, s);
+        listener.BeginAcceptSocket(AcceptCallback, listener);
         accepted.WaitOne();
       }
     }

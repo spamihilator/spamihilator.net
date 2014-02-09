@@ -33,13 +33,9 @@ namespace Spamihilator {
     virtual public void Connect(String host, int port,
       ConnectCallback callback) {
       IPHostEntry entry = Dns.GetHostEntry(host);
-      IPAddress addr = entry.AddressList[0];
-      IPEndPoint remoteEP = new IPEndPoint(addr, port);
-
-      socket = new Socket(AddressFamily.InterNetwork,
-        SocketType.Stream, ProtocolType.Tcp);
-      socket.BeginConnect(remoteEP, ar => ConnectCallbackInternal(
-        ar, callback), this);
+      socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+      socket.BeginConnect(entry.AddressList, port,
+        ar => ConnectCallbackInternal(ar, callback), this);
     }
 
     /// <summary>

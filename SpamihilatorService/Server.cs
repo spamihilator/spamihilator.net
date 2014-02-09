@@ -25,8 +25,8 @@ namespace Spamihilator {
     /// </summary>
     /// <param name="ar">the result of the asynchronous operation</param>
     public void Accept(IAsyncResult ar) {
-      Socket s = (Socket)ar.AsyncState;
-      socket = s.EndAccept(ar);
+      TcpListener l = (TcpListener)ar.AsyncState;
+      socket = l.EndAcceptSocket(ar);
       OnConnect();
     }
 
